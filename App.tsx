@@ -70,6 +70,7 @@ useEffect(() => {
 }
 
 interface Styles {
+  buttonContainer: ViewStyle;
   container: ViewStyle;
   incrementButton: ViewStyle;
   decrementButton: ViewStyle;
