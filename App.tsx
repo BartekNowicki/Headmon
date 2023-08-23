@@ -6,8 +6,8 @@ import * as SQLite from 'expo-sqlite';
 const db = SQLite.openDatabase('counter.db');
 
 const App: React.FC = () => {
-  const [counter, setCounter] = useState<number>(0);
-  const [retrievedCounter, setRetrievedCounter] = useState<number | null>(null);
+  const [counter_state, setCounter_state] = useState<number>(0);
+  const [counter_db, setCounter_db] = useState<number>(0);
 
  useEffect(() => {
     console.log("counter db set up initiated");
@@ -16,49 +16,54 @@ const App: React.FC = () => {
     });
   }, []);
 
-  const storeCounter = () => {
+  const storeCounterInDb = () => {
       console.log("storing counter in db");
       db.transaction(tx => {
-        tx.executeSql('insert into counter (value) values (?)', [counter]);
+        tx.executeSql('insert into counter (value) values (?)', [counter_state]);
       },
       error => { console.error("Error storing counter:", error); },
-      () => { setRetrievedCounter(counter); });
+      () => { setCounter_db(counter_state); });
     };
 
-    const fetchCounter = () => {
-      console.log("fetching counter from db");
-      db.transaction(tx => {
-        tx.executeSql('select * from counter order by id desc limit 1', [], (_, { rows }) => {
-          if (rows.length > 0) {
-            setRetrievedCounter(rows.item(0).value);
-          } else {
-            setRetrievedCounter(null);
-          }
+    const logDatabaseContents = async () => {
+        db.transaction(tx => {
+            tx.executeSql('SELECT * FROM counter', [], (_, { rows }) => {
+                console.log("Logging entire counter table:");
+                let data = rows._array;
+                let headers = Object.keys(data[0] || {}).join("\t");
+                console.log(headers);
+                data.forEach(item => {
+                    console.log(`${item.id}\t${item.value}`);
+                });
+            });
+        },
+        error => {
+            console.error("Error fetching data from the database:", error);
         });
-      },
-      error => { console.error("Error fetching counter:", error) });
     };
+
+useEffect(() => {
+      storeCounterInDb();
+    }, [counter_state]);
 
     useEffect(() => {
-      fetchCounter();
-    }, [counter]);
+          logDatabaseContents();
+        }, [counter_db]);
+
+
+
 
   return (
     <View style={styles.container}>
-      <Text style={styles.counter}>Counter: {counter}</Text>
+      <Text style={styles.counter}>Counter: {counter_state}</Text>
       <View style={styles.buttonContainer}>
-      <TouchableOpacity style={styles.incrementButton} onPress={() => setCounter(prev => prev + 1)}>
+      <TouchableOpacity style={styles.incrementButton} onPress={() => setCounter_state(prev => prev + 1)}>
         <Text style={styles.buttonText}>+</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.decrementButton} onPress={() => setCounter(prev => prev > 0 ? prev - 1 : prev)}>
+      <TouchableOpacity style={styles.decrementButton} onPress={() => setCounter_state(prev => prev > 0 ? prev - 1 : prev)}>
         <Text style={styles.buttonText}>-</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.storeCounterButton} onPress={storeCounter}>
-         <Text style={styles.buttonText}>save</Text>
-      </TouchableOpacity>
     </View>
-
-        {retrievedCounter !== null && <Text style={styles.counter}>Retrieved Counter: {retrievedCounter}</Text>}
       <StatusBar style="auto" />
     </View>
   );
