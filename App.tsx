@@ -11,7 +11,6 @@ const App: React.FC = () => {
 
  useEffect(() => {
     console.log("counter db set up initiated");
-
     db.transaction(tx => {
       tx.executeSql('create table if not exists counter (id integer primary key not null, value int);');
     });
@@ -22,12 +21,8 @@ const App: React.FC = () => {
       db.transaction(tx => {
         tx.executeSql('insert into counter (value) values (?)', [counter]);
       },
-      error => {
-            console.error("Error storing counter:", error);
-          },
-      () => {
-              setRetrievedCounter(counter);
-          });
+      error => { console.error("Error storing counter:", error); },
+      () => { setRetrievedCounter(counter); });
     };
 
     const fetchCounter = () => {
@@ -41,9 +36,7 @@ const App: React.FC = () => {
           }
         });
       },
-      error => {
-            console.error("Error fetching counter:", error);
-          });
+      error => { console.error("Error fetching counter:", error) });
     };
 
     useEffect(() => {
@@ -57,16 +50,13 @@ const App: React.FC = () => {
       <TouchableOpacity style={styles.incrementButton} onPress={() => setCounter(prev => prev + 1)}>
         <Text style={styles.buttonText}>+</Text>
       </TouchableOpacity>
-
       <TouchableOpacity style={styles.decrementButton} onPress={() => setCounter(prev => prev > 0 ? prev - 1 : prev)}>
         <Text style={styles.buttonText}>-</Text>
       </TouchableOpacity>
-
       <TouchableOpacity style={styles.storeCounterButton} onPress={storeCounter}>
          <Text style={styles.buttonText}>save</Text>
       </TouchableOpacity>
-
-      </View>
+    </View>
 
         {retrievedCounter !== null && <Text style={styles.counter}>Retrieved Counter: {retrievedCounter}</Text>}
       <StatusBar style="auto" />
@@ -91,12 +81,12 @@ const styles = StyleSheet.create<Styles>({
     justifyContent: 'center',
   },
   buttonContainer: {
-  padding: 10,
-  borderRadius: 20,
-  backgroundColor: 'gray',
-  flexDirection: 'row'},
+    padding: 10,
+    borderRadius: 20,
+    backgroundColor: 'gray',
+    flexDirection: 'row'},
   incrementButton: {
-  width: 50,
+    width: 50,
     backgroundColor: 'red',
     padding: 10,
     margin: 5,
@@ -105,7 +95,7 @@ const styles = StyleSheet.create<Styles>({
     justifyContent: 'center',
   },
   decrementButton: {
-  width: 50,
+    width: 50,
     backgroundColor: 'blue',
     padding: 10,
     margin: 5,
@@ -125,9 +115,8 @@ const styles = StyleSheet.create<Styles>({
     alignItems: 'center',
     justifyContent: 'center',},
   counter: {
-  fontWeight: 'bold'
+    fontWeight: 'bold'
   }
-
 });
 
 export default App;
