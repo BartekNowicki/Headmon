@@ -1,8 +1,10 @@
 {
-    "editor.fontSize": 11,
+    "editor.fontSize": 14,
     "screencastMode.fontSize": 20,
     "scm.inputFontSize": 11,
     "debug.console.fontSize": 11,
-    "terminal.integrated.fontSize": 11,
-    "chat.editor.fontSize": 11
+    "terminal.integrated.fontSize": 14,
+    "chat.editor.fontSize": 11,
+    "workbench.colorTheme": "One Dark Pro Darker",
+    "oneDarkPro.editorTheme": "One Dark Pro Darker"
 }
