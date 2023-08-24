@@ -1,152 +1,131 @@
-import React, { useState, useEffect } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  ViewStyle,
-  TouchableOpacity,
-} from "react-native";
+import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, TextInput, StyleSheet } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { StatusBar } from "expo-status-bar";
 import * as SQLite from "expo-sqlite";
 
 const db = SQLite.openDatabase("counter.db");
 
-const App: React.FC = () => {
-  const [counter_state, setCounter_state] = useState<number>(0);
-  const [counter_db, setCounter_db] = useState<number>(0);
+enum Med {
+  Ibuprofen = "Ibuprofen",
+  Paracetamol = "Paracetamol"
+}
 
+interface Incident {
+  date: {
+    hour: number;   // assuming 0-23 format
+    day: number;    // assuming 1-31 format
+    month: number;  // assuming 1-12 format
+    year: number;   
+  };
+  med: string;
+  dosage: number;
+}
+
+const App: React.FC = () => {
+  const [date, setDate] = useState<string>('');
+  const [med, setMed] = useState<string>('');
+  const [dosage, setDosage] = useState<number>(0);
+  const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
+  
   useEffect(() => {
-    console.log("counter db set up initiated");
+    console.log("incident db set up initiated");
     db.transaction((tx) => {
       tx.executeSql(
-        "create table if not exists counter (id integer primary key not null, value int);"
+        `create table if not exists incident (id integer primary key not null,
+          date text, 
+          med text,
+          dosage int
       );
+      `);
     });
   }, []);
 
-  const storeCounterInDb = () => {
-    console.log("storing counter in db");
-    db.transaction(
-      (tx) => {
-        tx.executeSql("insert into counter (value) values (?)", [
-          counter_state,
-        ]);
-      },
-      (error) => {
-        console.error("Error storing counter:", error);
-      },
-      () => {
-        setCounter_db(counter_state);
-      }
-    );
+  const handleDateChange = (event: any, selectedDate?: Date) => {
+    setShowDatePicker(false);
+    if (selectedDate) {
+      setDate(`${selectedDate.getDate()}-${selectedDate.getMonth() + 1}-${selectedDate.getFullYear()}`);
+    }
   };
-
-  const logDatabaseContents = async () => {
-    db.transaction(
-      (tx) => {
-        tx.executeSql("SELECT * FROM counter", [], (_, { rows }) => {
-          console.log("Logging entire counter table:");
-          let data = rows._array;
-          let headers = Object.keys(data[0] || {}).join("\t");
-          console.log(headers);
-          data.forEach((item) => {
-            console.log(`${item.id}\t${item.value}`);
-          });
-        });
-      },
-      (error) => {
-        console.error("Error fetching data from the database:", error);
-      }
-    );
-  };
-
-  useEffect(() => {
-    storeCounterInDb();
-  }, [counter_state]);
-
-  useEffect(() => {
-    logDatabaseContents();
-  }, [counter_db]);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.counter}>Counter: {counter_state}</Text>
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          style={styles.incrementButton}
-          onPress={() => setCounter_state((prev) => prev + 1)}
-        >
-          <Text style={styles.buttonText}>+</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.decrementButton}
-          onPress={() =>
-            setCounter_state((prev) => (prev > 0 ? prev - 1 : prev))
+      {/* Med selection */}
+      <TouchableOpacity style={styles.button} onPress={() => setMed('Ibuprofen')}>
+        <Text style={styles.buttonText}>Ibuprofen</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.button} onPress={() => setMed('Paracetamol')}>
+        <Text style={styles.buttonText}>Paracetamol</Text>
+      </TouchableOpacity>
+
+      {/* Date selection */}
+      <TouchableOpacity style={styles.dateButton} onPress={() => setShowDatePicker(true)}>
+        <Text style={styles.buttonText}>Select Date</Text>
+      </TouchableOpacity>
+      {showDatePicker && (
+        <DateTimePicker
+          value={new Date()}
+          mode="date"
+          display="default"
+          onChange={handleDateChange}
+        />
+      )}
+
+      {/* Dosage input */}
+      <TextInput
+        style={styles.dosageInput}
+        keyboardType="numeric"
+        value={String(dosage)}
+        onChangeText={text => {
+          const num = parseInt(text, 10);
+          if (num >= 0 && num <= 1200) {
+            setDosage(num);
           }
-        >
-          <Text style={styles.buttonText}>-</Text>
-        </TouchableOpacity>
-      </View>
-      <StatusBar style="auto" />
+        }}
+        placeholder="Enter dosage (0-1200)"
+      />
+
+      <Text>Date: {date}</Text>
+      <Text>Med: {med}</Text>
+      <Text>Dosage: {dosage}</Text>
     </View>
   );
-};
-
-interface Styles {
-  buttonContainer: ViewStyle;
-  container: ViewStyle;
-  incrementButton: ViewStyle;
-  decrementButton: ViewStyle;
-  buttonText: ViewStyle;
-  storeCounterButton: ViewStyle;
-  counter: ViewStyle;
 }
 
-const styles = StyleSheet.create<Styles>({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F5FCFF',
   },
-  buttonContainer: {
-    padding: 10,
-    borderRadius: 20,
-    backgroundColor: "gray",
-    flexDirection: "row",
+  button: {
+    backgroundColor: '#4CAF50',
+    padding: 15,
+    margin: 10,
+    width: 150,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  incrementButton: {
-    width: 50,
-    backgroundColor: "red",
+  dateButton: {
+    backgroundColor: '#4CAF50',
     padding: 10,
-    margin: 5,
-    borderRadius: 5,
-    alignItems: "center",
-    justifyContent: "center",
+    margin: 10,
+    width: 150,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  decrementButton: {
-    width: 50,
-    backgroundColor: "blue",
+  dosageInput: {
+    borderWidth: 1,
+    borderColor: '#4CAF50',
     padding: 10,
-    margin: 5,
-    borderRadius: 5,
-    alignItems: "center",
-    justifyContent: "center",
+    width: 200,
+    textAlign: 'center',
+    margin: 10,
   },
   buttonText: {
-    color: "white",
-    fontSize: 20,
-  },
-  storeCounterButton: {
-    backgroundColor: "green",
-    padding: 10,
-    margin: 5,
-    borderRadius: 5,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  counter: {
-    fontWeight: "bold",
+    color: 'white',
+    fontSize: 18,
   },
 });
 
