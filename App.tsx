@@ -10,7 +10,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { StatusBar } from "expo-status-bar";
 import * as SQLite from "expo-sqlite";
 
-const db = SQLite.openDatabase("counter.db");
+const db = SQLite.openDatabase("incident.db");
 
 enum Med {
   Ibuprofen = "Ibuprofen",
