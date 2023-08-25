@@ -19,10 +19,12 @@ enum Med {
 
 const HomeScreen: React.FC = ({ navigation }) => {
   const [date, setDate] = useState<string>("");
+  const [hour, setHour] = useState<string>("");
   const [med, setMed] = useState<string>("");
   const [dosage, setDosage] = useState<number>(0);
   const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
   const [isDateError, setIsDateError] = useState<boolean>(false);
+  const [isHourError, setIsHourError] = useState<boolean>(false);
   const [isMedError, setIsMedError] = useState<boolean>(false);
   const [isDosageError, setIsDosageError] = useState<boolean>(false);
 
@@ -31,11 +33,12 @@ const HomeScreen: React.FC = ({ navigation }) => {
     db.transaction((tx) => {
       tx.executeSql(
         `create table if not exists incident (id integer primary key not null,
-          date text, 
-          med text,
-          dosage int
-      );
-      `
+        date text, 
+        hour text,
+        med text,
+        dosage int
+    );
+    `
       );
     });
   }, []);
@@ -52,11 +55,11 @@ const HomeScreen: React.FC = ({ navigation }) => {
   };
 
   const saveIncident = () => {
-    if (date && med && dosage) {
+    if (date && hour && med && dosage) {
       db.transaction((tx) => {
         tx.executeSql(
-          "INSERT INTO incident (date, med, dosage) VALUES (?, ?, ?);",
-          [date, med, dosage],
+          "INSERT INTO incident (date, hour, med, dosage) VALUES (?, ?, ?, ?);",
+          [date, hour, med, dosage],
           (_, result) => {
             console.log("Data Inserted Successfully:", result);
 
@@ -88,6 +91,12 @@ const HomeScreen: React.FC = ({ navigation }) => {
         setIsDateError(true);
         setTimeout(() => {
           setIsDateError(false);
+        }, 3000);
+      } else if (!hour) {
+        console.log("select the hour");
+        setIsHourError(true);
+        setTimeout(() => {
+          setIsHourError(false);
         }, 3000);
       } else if (!med) {
         console.log("select the medication");
@@ -160,19 +169,30 @@ const HomeScreen: React.FC = ({ navigation }) => {
       )}
 
       <TextInput
+        style={[styles.hourInput, isHourError ? styles.errorBorder : {}]}
+        value={hour}
+        onChangeText={(text) => {
+          setHour(text);
+        }}
+        placeholder="Hour (HH:mm)"
+      />
+
+      <TextInput
         style={[styles.dosageInput, isDosageError ? styles.errorBorder : {}]}
         keyboardType="numeric"
-        value={String(dosage)}
+        value={dosage ? String(dosage) : ""}
         onChangeText={(text) => {
           const num = parseInt(text, 10);
           if (num >= 0 && num <= 1200) {
             setDosage(num);
           }
         }}
-        placeholder="Enter dosage (0-1200)"
+        placeholder="Dosage (0-1200)"
       />
 
-      <Text>Date: {date}</Text>
+      <Text>
+        Date: {date} {hour}
+      </Text>
       <Text>Med: {med}</Text>
       <Text>Dosage: {dosage}</Text>
 
@@ -221,10 +241,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 10,
   },
+  hourInput: {
+    borderWidth: 1,
+    borderColor: "#4CAF50",
+    padding: 5,
+    width: 130,
+    textAlign: "center",
+    margin: 5,
+  },
   dosageInput: {
     borderWidth: 1,
     borderColor: "#4CAF50",
-    padding: 10,
+    padding: 5,
     width: 130,
     textAlign: "center",
     margin: 5,
