@@ -22,6 +22,9 @@ const HomeScreen: React.FC = ({ navigation }) => {
   const [med, setMed] = useState<string>("");
   const [dosage, setDosage] = useState<number>(0);
   const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
+  const [isDateError, setIsDateError] = useState<boolean>(false);
+  const [isMedError, setIsMedError] = useState<boolean>(false);
+  const [isDosageError, setIsDosageError] = useState<boolean>(false);
 
   useEffect(() => {
     console.log("incident db set up initiated");
@@ -79,7 +82,26 @@ const HomeScreen: React.FC = ({ navigation }) => {
         );
       });
     } else {
-      console.log("Please ensure all fields are filled.");
+      console.log("Please ensure all fields are filled - ");
+      if (!date) {
+        console.log("select the date");
+        setIsDateError(true);
+        setTimeout(() => {
+          setIsDateError(false);
+        }, 3000);
+      } else if (!med) {
+        console.log("select the medication");
+        setIsMedError(true);
+        setTimeout(() => {
+          setIsMedError(false);
+        }, 3000);
+      } else {
+        console.log("select the dosage");
+        setIsDosageError(true);
+        setTimeout(() => {
+          setIsDosageError(false);
+        }, 3000);
+      }
     }
   };
 
@@ -89,7 +111,11 @@ const HomeScreen: React.FC = ({ navigation }) => {
         <TouchableOpacity
           style={[
             styles.button,
-            med === Med.Ibuprofen ? styles.selectedButton : {},
+            isMedError
+              ? styles.errorBorder
+              : med === Med.Ibuprofen
+              ? styles.selectedButton
+              : {},
           ]}
           onPress={() => setMed(Med.Ibuprofen)}
         >
@@ -98,7 +124,11 @@ const HomeScreen: React.FC = ({ navigation }) => {
         <TouchableOpacity
           style={[
             styles.button,
-            med === Med.Paracetamol ? styles.selectedButton : {},
+            isMedError
+              ? styles.errorBorder
+              : med === Med.Paracetamol
+              ? styles.selectedButton
+              : {},
           ]}
           onPress={() => setMed(Med.Paracetamol)}
         >
@@ -107,7 +137,14 @@ const HomeScreen: React.FC = ({ navigation }) => {
       </View>
 
       <TouchableOpacity
-        style={[styles.dateButton, date ? styles.dateButtonSelected : {}]}
+        style={[
+          styles.dateButton,
+          isDateError
+            ? styles.errorBorder
+            : date
+            ? styles.dateButtonSelected
+            : {},
+        ]}
         onPress={() => setShowDatePicker(true)}
       >
         <Text style={styles.buttonText}>Select Date</Text>
@@ -123,7 +160,7 @@ const HomeScreen: React.FC = ({ navigation }) => {
       )}
 
       <TextInput
-        style={styles.dosageInput}
+        style={[styles.dosageInput, isDosageError ? styles.errorBorder : {}]}
         keyboardType="numeric"
         value={String(dosage)}
         onChangeText={(text) => {
@@ -223,6 +260,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 10,
+  },
+  errorBorder: {
+    borderColor: "red",
+    borderWidth: 4,
   },
 });
 
