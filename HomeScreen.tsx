@@ -85,32 +85,29 @@ const HomeScreen: React.FC = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-       <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={[
-                styles.button,
-                med === Med.Ibuprofen ? styles.selectedButton : {},
-              ]}
-              onPress={() => setMed(Med.Ibuprofen)}
-            >
-              <Text style={styles.buttonText}>{Med.Ibuprofen}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                styles.button,
-                med === Med.Paracetamol ? styles.selectedButton : {},
-              ]}
-              onPress={() => setMed(Med.Paracetamol)}
-            >
-              <Text style={styles.buttonText}>{Med.Paracetamol}</Text>
-            </TouchableOpacity>
-          </View>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          style={[
+            styles.button,
+            med === Med.Ibuprofen ? styles.selectedButton : {},
+          ]}
+          onPress={() => setMed(Med.Ibuprofen)}
+        >
+          <Text style={styles.buttonText}>{Med.Ibuprofen}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.button,
+            med === Med.Paracetamol ? styles.selectedButton : {},
+          ]}
+          onPress={() => setMed(Med.Paracetamol)}
+        >
+          <Text style={styles.buttonText}>{Med.Paracetamol}</Text>
+        </TouchableOpacity>
+      </View>
 
       <TouchableOpacity
-        style={[
-          styles.dateButton,
-          date ? styles.dateButtonSelected : {}
-        ]}
+        style={[styles.dateButton, date ? styles.dateButtonSelected : {}]}
         onPress={() => setShowDatePicker(true)}
       >
         <Text style={styles.buttonText}>Select Date</Text>
@@ -146,9 +143,12 @@ const HomeScreen: React.FC = ({ navigation }) => {
         <Text style={styles.saveButtonText}>Save</Text>
       </TouchableOpacity>
 
-       <TouchableOpacity style={styles.graphButton} onPress={() => navigation.navigate('Graph')}>
-              <Text>{"Graph >>"}</Text>
-            </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.graphButton}
+        onPress={() => navigation.navigate("Graph")}
+      >
+        <Text>{"Graph >>"}</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -161,11 +161,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#F5FCFF",
   },
   buttonContainer: {
-      flexDirection: 'row',
-      justifyContent: 'space-around',
-      width: '100%',
-      paddingHorizontal: 20,
-    },
+    flexDirection: "row",
+    justifyContent: "space-around",
+    width: "100%",
+    paddingHorizontal: 20,
+  },
   button: {
     backgroundColor: "#4CAF50",
     padding: 10,
@@ -200,8 +200,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#2E7D32",
   },
   dateButtonSelected: {
-      backgroundColor: "#4169E1",
-    },
+    backgroundColor: "#4169E1",
+  },
   saveButton: {
     backgroundColor: "#FF0000",
     padding: 13,
@@ -216,15 +216,14 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   graphButton: {
-      backgroundColor: "rgba(0, 0, 0, 0.5)",
-      padding: 13,
-      margin: 5,
-      width: 130,
-      justifyContent: "center",
-      alignItems: "center",
-      borderRadius: 10,
-    },
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    padding: 13,
+    margin: 5,
+    width: 130,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 10,
+  },
 });
-
 
 export default HomeScreen;
