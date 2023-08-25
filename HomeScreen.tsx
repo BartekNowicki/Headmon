@@ -55,6 +55,9 @@ const HomeScreen: React.FC = ({ navigation }) => {
   };
 
   const saveIncident = () => {
+    console.log(
+      `checking if I can save to db: ${date} ${hour} ${med} ${dosage}`
+    );
     if (date && hour && med && dosage) {
       db.transaction((tx) => {
         tx.executeSql(
