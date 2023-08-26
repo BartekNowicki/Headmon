@@ -2,11 +2,13 @@ import React from "react";
 import { View, Button, Alert, StyleSheet } from "react-native";
 import * as SQLite from "expo-sqlite";
 import * as DocumentPicker from "expo-document-picker";
+import * as FileSystem from "expo-file-system";
 
 const db = SQLite.openDatabase("incident.db");
 
 const SettingsScreen: React.FC = ({ navigation }) => {
   const clearDatabase = () => {
+    console.log("Initiating database data deletion...");
     db.transaction((tx) => {
       tx.executeSql(
         "DELETE FROM incident;",
@@ -26,15 +28,24 @@ const SettingsScreen: React.FC = ({ navigation }) => {
     const result = await DocumentPicker.getDocumentAsync({
       type: "application/json",
     });
-    if (result.type === "success") {
+
+    if (!result.canceled) {
+      const uri = result.assets[0].uri;
+      console.log("Selected file URI:", uri);
       try {
-        const content = await FileSystem.readAsStringAsync(result.uri);
+        const content = await FileSystem.readAsStringAsync(uri);
+        console.log("File content:", content);
         const jsonData = JSON.parse(content);
         jsonData.forEach((item) => {
           db.transaction((tx) => {
             tx.executeSql(
               "INSERT INTO incident (date, hour, med, dosage) VALUES (?, ?, ?, ?);",
-              [item.date, item.hour, item.med, item.dosage]
+              [item.date, item.hour, item.med, item.dosage],
+              (_, resultSet) => console.log("Insert success:", resultSet),
+              (_, error) => {
+                console.log("Insert error:", error);
+                return false;
+              }
             );
           });
         });
