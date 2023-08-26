@@ -49,9 +49,11 @@ const GraphScreen: React.FC = ({ navigation }) => {
     fetchData()
       .then((fetchedData) => {
         setOriginalData(fetchedData);
-        const labels = fetchedData.map((item) =>
-          item.date.split("-").slice(0, 2).join("-")
+        const labels = fetchedData.map(
+          (item) =>
+            `${item.date.split("-").slice(0, 2).join(".")} - ${item.hour}`
         );
+
         const datasetData = fetchedData.map((item) => item.dosage);
 
         setData({
@@ -97,42 +99,40 @@ const GraphScreen: React.FC = ({ navigation }) => {
     backgroundColor: "#e26a00",
     backgroundGradientFrom: "#fb8c00",
     backgroundGradientTo: "#ffa726",
-    color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+    color: (opacity = 1) => {
+      const item = originalData[colorIndex];
+      colorIndex = (colorIndex + 1) % originalData.length;
+      return item.med === "Ibuprofen"
+        ? `rgba(255, 0, 0, ${opacity})`
+        : `rgba(0, 0, 128, ${opacity})`;
+    },
     propsForDots: {
       r: "0",
       strokeWidth: "2",
       stroke: "#ffa726",
     },
+    decimalPlaces: 0,
   };
+
+  let colorIndex = 0;
 
   return (
     <View style={styles.container}>
-      <ScrollView horizontal={true}>
+      <ScrollView horizontal={true} style={{ paddingRight: 100 }}>
         <BarChart
           data={data}
-          width={Dimensions.get("window").width * 2}
-          height={220}
+          width={Dimensions.get("window").width * 2 - 20}
+          height={Dimensions.get("window").height * 0.8 - 20}
           yAxisLabel=""
-          yAxisSuffix="mg"
-          chartConfig={{
-            backgroundColor: "#e26a00",
-            backgroundGradientFrom: "#fb8c00",
-            backgroundGradientTo: "#ffa726",
-            decimalPlaces: 0,
-            color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-            style: {
-              borderRadius: 16,
-            },
-            propsForDots: {
-              r: "0",
-              strokeWidth: "2",
-              stroke: "#ffa726",
-            },
-          }}
+          yAxisSuffix="  mg"
+          chartConfig={chartConfig}
           style={{
-            marginVertical: 8,
+            marginVertical: 0,
+            paddingTop: 30,
+            marginHorizontal: 20,
+            paddingHorizontal: 10,
             borderRadius: 16,
-            margin: 10,
+            marginRight: 20,
           }}
         />
       </ScrollView>
