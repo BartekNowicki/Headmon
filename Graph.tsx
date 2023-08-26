@@ -5,9 +5,12 @@ import {
   StyleSheet,
   TouchableOpacity,
   Text,
+  Alert,
 } from "react-native";
 import { BarChart } from "react-native-chart-kit";
 import * as SQLite from "expo-sqlite";
+import * as FileSystem from "expo-file-system";
+import * as Sharing from "expo-sharing";
 
 const db = SQLite.openDatabase("incident.db");
 
@@ -34,6 +37,26 @@ const Graph: React.FC = () => {
   if (!data) {
     return <Text>Loading...</Text>;
   }
+
+  const downloadData = async () => {
+    const fileName = FileSystem.documentDirectory + "data.txt";
+    const dataString = JSON.stringify(data);
+
+    try {
+      await FileSystem.writeAsStringAsync(fileName, dataString);
+      await Sharing.shareAsync(fileName);
+    } catch (error) {
+      Alert.alert("Error", "There was an error while downloading the data.");
+    }
+  };
+
+  const shareData = async () => {
+    try {
+      await Sharing.shareAsync(FileSystem.documentDirectory + "data.txt");
+    } catch (error) {
+      Alert.alert("Error", "There was an error while sharing the data.");
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -65,20 +88,22 @@ const Graph: React.FC = () => {
         }}
       />
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={[styles.button, styles.downloadButton]}>
-          <Text style={styles.buttonText}>Download to Disk</Text>
+        <TouchableOpacity
+          style={[styles.button, styles.downloadButton]}
+          onPress={downloadData}
+        >
+          <Text style={styles.buttonText}>Download</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.button, styles.shareButton]}>
-          <Text style={styles.buttonText}>Share Data</Text>
+        <TouchableOpacity
+          style={[styles.button, styles.shareButton]}
+          onPress={shareData}
+        >
+          <Text style={styles.buttonText}>Share</Text>
         </TouchableOpacity>
       </View>
     </View>
   );
 };
-
-// ... [rest of the code remains unchanged]
-
-export default Graph;
 
 const styles = StyleSheet.create({
   container: {
