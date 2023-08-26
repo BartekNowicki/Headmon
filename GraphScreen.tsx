@@ -23,8 +23,9 @@ interface Incident {
   med: string;
 }
 
-const Graph: React.FC = () => {
+const GraphScreen: React.FC = ({ navigation }) => {
   const [data, setData] = useState(null);
+  const [originalData, setOriginalData] = useState([]);
 
   const fetchData = (): Promise<Incident[]> => {
     return new Promise((resolve, reject) => {
@@ -47,6 +48,7 @@ const Graph: React.FC = () => {
   useEffect(() => {
     fetchData()
       .then((fetchedData) => {
+        setOriginalData(fetchedData);
         const labels = fetchedData.map((item) =>
           item.date.split("-").slice(0, 2).join("-")
         );
@@ -68,22 +70,24 @@ const Graph: React.FC = () => {
   }
 
   const downloadData = async () => {
-    const fileName = FileSystem.documentDirectory + "data.txt";
-    const dataString = JSON.stringify(data);
+    const fileName = FileSystem.documentDirectory + "data.json";
+    const dataString = JSON.stringify(originalData);
 
     try {
       await FileSystem.writeAsStringAsync(fileName, dataString);
+      Alert.alert("Success", "Data has been saved!");
       await Sharing.shareAsync(fileName);
-      Alert.alert("Success", "Data saved successfully!");
     } catch (error) {
-      console.error("Error saving data:", error);
       Alert.alert("Error", "There was an error while downloading the data.");
     }
   };
 
   const shareData = async () => {
+    const fileName = FileSystem.documentDirectory + "data.json";
+    const dataString = JSON.stringify(data);
     try {
-      await Sharing.shareAsync(FileSystem.documentDirectory + "data.txt");
+      await FileSystem.writeAsStringAsync(fileName, dataString);
+      await Sharing.shareAsync(fileName);
     } catch (error) {
       Alert.alert("Error", "There was an error while sharing the data.");
     }
@@ -182,4 +186,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Graph;
+export default GraphScreen;

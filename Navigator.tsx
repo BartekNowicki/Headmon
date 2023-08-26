@@ -1,7 +1,8 @@
 import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import HomeScreen from "./HomeScreen";
-import Graph from "./Graph";
+import GraphScreen from "./GraphScreen";
+import SettingsScreen from "./SettingsScreen";
 
 const Stack = createStackNavigator();
 
@@ -17,7 +18,8 @@ const RootNavigator: React.FC = () => {
           },
         }}
       />
-      <Stack.Screen name="Graph" component={Graph} />
+      <Stack.Screen name="GraphScreen" component={GraphScreen} />
+      <Stack.Screen name="SettingsScreen" component={SettingsScreen} />
     </Stack.Navigator>
   );
 };

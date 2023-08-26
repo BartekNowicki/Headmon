@@ -9,6 +9,7 @@ import {
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { StatusBar } from "expo-status-bar";
 import * as SQLite from "expo-sqlite";
+import * as DocumentPicker from "expo-document-picker";
 
 const db = SQLite.openDatabase("incident.db");
 
@@ -117,6 +118,15 @@ const HomeScreen: React.FC = ({ navigation }) => {
     }
   };
 
+  const pickDocument = async () => {
+    console.log("attempting to pick a document");
+    let result = await DocumentPicker.getDocumentAsync({});
+    console.log(result);
+    if (result.type === "success") {
+      // Handle the picked document
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.buttonContainer}>
@@ -205,9 +215,15 @@ const HomeScreen: React.FC = ({ navigation }) => {
 
       <TouchableOpacity
         style={styles.graphButton}
-        onPress={() => navigation.navigate("Graph")}
+        onPress={() => navigation.navigate("GraphScreen")}
       >
-        <Text>{"Graph >>"}</Text>
+        <Text>{"Graph"}</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.settingsButton}
+        onPress={() => navigation.navigate("SettingsScreen")}
+      >
+        <Text>{"Settings"}</Text>
       </TouchableOpacity>
     </View>
   );
@@ -284,6 +300,15 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   graphButton: {
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    padding: 13,
+    margin: 5,
+    width: 130,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 10,
+  },
+  settingsButton: {
     backgroundColor: "rgba(0, 0, 0, 0.5)",
     padding: 13,
     margin: 5,
