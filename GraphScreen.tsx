@@ -59,7 +59,9 @@ const GraphScreen: React.FC = ({ navigation }) => {
           const labels = fetchedData
             ? fetchedData.map(
                 (item) =>
-                  `${item.date.split("-").slice(0, 2).join(".")}\n${item.hour}`
+                  `${item.date.split("-").slice(0, 2).join(".")}/${item.hour}${
+                    item.med[0]
+                  }`
               )
             : [];
 
@@ -128,8 +130,6 @@ const GraphScreen: React.FC = ({ navigation }) => {
     },
     decimalPlaces: 0,
   };
-
-  let colorIndex = 0;
 
   return (
     <View style={styles.container}>
