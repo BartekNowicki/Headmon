@@ -26,6 +26,7 @@ interface Incident {
 const GraphScreen: React.FC = ({ navigation }) => {
   const [data, setData] = useState(null);
   const [originalData, setOriginalData] = useState([]);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchData = (): Promise<Incident[]> => {
     return new Promise((resolve, reject) => {
@@ -48,24 +49,42 @@ const GraphScreen: React.FC = ({ navigation }) => {
   useEffect(() => {
     fetchData()
       .then((fetchedData) => {
-        setOriginalData(fetchedData);
-        const labels = fetchedData.map(
-          (item) =>
-            `${item.date.split("-").slice(0, 2).join(".")} - ${item.hour}`
-        );
+        console.log("Fetched Data:", fetchedData);
+        if (
+          Array.isArray(fetchedData) &&
+          fetchedData &&
+          fetchedData.length > 0
+        ) {
+          setOriginalData(fetchedData);
+          const labels = fetchedData
+            ? fetchedData.map(
+                (item) =>
+                  `${item.date.split("-").slice(0, 2).join(".")}\n${item.hour}`
+              )
+            : [];
 
-        const datasetData = fetchedData.map((item) => item.dosage);
+          const datasetData = fetchedData
+            ? fetchedData.map((item) => item.dosage)
+            : [];
 
-        setData({
-          labels: labels,
-          datasets: [{ data: datasetData }],
-        });
+          setData({
+            labels: labels,
+            datasets: [{ data: datasetData }],
+          });
+        } else {
+          setError("The dataset contains no entries.");
+        }
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
         Alert.alert("Error", "There was an error fetching the data.");
+        setError("There was an error fetching the data.");
       });
   }, []);
+
+  if (error) {
+    return <Text>{error}</Text>;
+  }
 
   if (!data) {
     return <Text>Loading...</Text>;
@@ -97,18 +116,21 @@ const GraphScreen: React.FC = ({ navigation }) => {
 
   const chartConfig = {
     backgroundColor: "#e26a00",
+    backgroundGradientFromOpacity: 0.5,
+    barPercentage: 0.5,
     backgroundGradientFrom: "#fb8c00",
     backgroundGradientTo: "#ffa726",
     color: (opacity = 1) => {
       const item = originalData[colorIndex];
       colorIndex = (colorIndex + 1) % originalData.length;
+      if (!item || (item && !("med" in item))) return `rgba(255, 0, 0, 1)`;
       return item.med === "Ibuprofen"
         ? `rgba(255, 0, 0, ${opacity})`
         : `rgba(0, 0, 128, ${opacity})`;
     },
     propsForDots: {
       r: "0",
-      strokeWidth: "2",
+      strokeWidth: 2,
       stroke: "#ffa726",
     },
     decimalPlaces: 0,
@@ -121,7 +143,7 @@ const GraphScreen: React.FC = ({ navigation }) => {
       <ScrollView horizontal={true} style={{ paddingRight: 100 }}>
         <BarChart
           data={data}
-          width={Dimensions.get("window").width * 2 - 20}
+          width={Dimensions.get("window").width * 1.75 - 20}
           height={Dimensions.get("window").height * 0.8 - 20}
           yAxisLabel=""
           yAxisSuffix="  mg"
