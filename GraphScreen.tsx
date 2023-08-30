@@ -120,14 +120,7 @@ const GraphScreen: React.FC = ({ navigation }) => {
     barPercentage: 0.5,
     backgroundGradientFrom: "#fb8c00",
     backgroundGradientTo: "#ffa726",
-    color: (opacity = 1) => {
-      const item = originalData[colorIndex];
-      colorIndex = (colorIndex + 1) % originalData.length;
-      if (!item || (item && !("med" in item))) return `rgba(255, 0, 0, 1)`;
-      return item.med === "Ibuprofen"
-        ? `rgba(255, 0, 0, ${opacity})`
-        : `rgba(0, 0, 128, ${opacity})`;
-    },
+    color: (opacity = 1) => `rgba(134, 65, 244, ${opacity})`,
     propsForDots: {
       r: "0",
       strokeWidth: 2,
@@ -148,6 +141,9 @@ const GraphScreen: React.FC = ({ navigation }) => {
           yAxisLabel=""
           yAxisSuffix="  mg"
           chartConfig={chartConfig}
+          showValuesOnTopOfBars={true}
+          showBarTops={true}
+          fromZero={true}
           style={{
             marginVertical: 0,
             paddingTop: 30,
